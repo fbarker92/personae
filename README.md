@@ -85,7 +85,7 @@ Use `npm run dist:setup`, `npm run dist:msi`, or `npm run dist:portable` to buil
 
 ## Releases
 
-Pushing a version tag such as `v0.2.0` starts the [Release GitHub Actions workflow](.github/workflows/release.yml). The tag must match the `version` in `package.json`. Actions builds the Windows packages and uploads them to a draft GitHub Release; publish the draft when it is ready. The workflow uses GitHub's automatically provided token.
+To cut a release, bump `version` in `package.json` and merge to `main`. The [Release GitHub Actions workflow](.github/workflows/release.yml) runs on every push to `main`. If there is no `v<version>` tag yet, it builds the Windows packages and publishes a GitHub Release, which also creates the tag. Pushes that don't change the version are skipped. The workflow uses GitHub's automatically provided token.
 
 The app checks public releases from the repository configured in `package.json`. For a fork, point that field to the fork's public repository if you want its builds to use their own update channel.
 
