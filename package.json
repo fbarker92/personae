@@ -1,0 +1,67 @@
+{
+  "name": "personae",
+  "productName": "Personae",
+  "version": "0.1.0",
+  "description": "A small, modern Steam account switcher",
+  "author": "Fergus Barker",
+  "repository": "https://github.com/YOUR_GITHUB_USERNAME/personae",
+  "main": "src/main.js",
+  "private": true,
+  "scripts": {
+    "start": "electron .",
+    "preview": "node scripts/preview-server.js",
+    "dist": "electron-builder --win",
+    "dist:setup": "electron-builder --win nsis",
+    "dist:msi": "electron-builder --win msi",
+    "dist:portable": "electron-builder --win portable"
+  },
+  "build": {
+    "appId": "dev.personae.app",
+    "productName": "Personae",
+    "copyright": "Copyright © 2026 Fergus Barker. Not affiliated with Valve Corporation.",
+    "files": [
+      "src/**/*"
+    ],
+    "directories": {
+      "output": "dist"
+    },
+    "publish": {
+      "provider": "github",
+      "releaseType": "draft"
+    },
+    "win": {
+      "target": [
+        "nsis",
+        "msi",
+        "portable"
+      ],
+      "icon": "src/assets/icon.png"
+    },
+    "nsis": {
+      "artifactName": "Personae-Setup-${version}.${ext}",
+      "oneClick": false,
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "Personae"
+    },
+    "msi": {
+      "artifactName": "Personae-${version}.${ext}",
+      "perMachine": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "Personae"
+    },
+    "portable": {
+      "artifactName": "Personae-${version}-portable.${ext}"
+    }
+  },
+  "devDependencies": {
+    "electron": "^44.4.5",
+    "electron-builder": "^26.15.3"
+  },
+  "dependencies": {
+    "electron-updater": "^6.8.9"
+  }
+}

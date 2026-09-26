@@ -1,0 +1,296 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy"
+        content="default-src 'self'; img-src 'self' data:; style-src 'self'; script-src 'self'">
+  <title>Personae</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <svg class="sprite" aria-hidden="true">
+    <defs>
+      <linearGradient id="g-mark" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0" class="mark-a"/><stop offset="1" class="mark-b"/>
+      </linearGradient>
+    </defs>
+    <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></symbol>
+    <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+    <symbol id="i-play" viewBox="0 0 24 24"><path d="M8 5.5v13a1 1 0 0 0 1.5.86l10.5-6.5a1 1 0 0 0 0-1.72L9.5 4.64A1 1 0 0 0 8 5.5Z" fill="currentColor" stroke="none"/></symbol>
+    <symbol id="i-more" viewBox="0 0 24 24"><circle cx="5" cy="12" r="1.4" fill="currentColor"/><circle cx="12" cy="12" r="1.4" fill="currentColor"/><circle cx="19" cy="12" r="1.4" fill="currentColor"/></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24"><path d="m5 12.5 4.5 4.5L19 7.5"/></symbol>
+    <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></symbol>
+    <symbol id="i-back" viewBox="0 0 24 24"><path d="M19 12H5M11 6l-6 6 6 6"/></symbol>
+    <symbol id="i-refresh" viewBox="0 0 24 24"><path d="M20 11a8 8 0 1 0-2.3 5.7M20 4v7h-7"/></symbol>
+    <symbol id="i-folder" viewBox="0 0 24 24"><path d="M3.5 7.5a2 2 0 0 1 2-2h4l2 2.5h7a2 2 0 0 1 2 2v7.5a2 2 0 0 1-2 2h-13a2 2 0 0 1-2-2Z"/></symbol>
+    <symbol id="i-copy" viewBox="0 0 24 24"><rect x="8.5" y="8.5" width="11" height="11" rx="2"/><path d="M15.5 8.5V6.5a2 2 0 0 0-2-2h-7a2 2 0 0 0-2 2v7a2 2 0 0 0 2 2h2"/></symbol>
+    <symbol id="i-external" viewBox="0 0 24 24"><path d="M14 4.5h5.5V10M19.5 4.5 11 13M18 14v4.5a1 1 0 0 1-1 1H5.5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1H10"/></symbol>
+    <symbol id="i-hide" viewBox="0 0 24 24"><path d="M3 3l18 18M10.6 5.1A10 10 0 0 1 12 5c5.5 0 9 7 9 7a16 16 0 0 1-2.9 3.7M6.6 6.6C4.3 8.2 3 12 3 12s3.5 7 9 7c1.7 0 3.2-.5 4.4-1.3M9.9 9.9a3 3 0 0 0 4.2 4.2"/></symbol>
+    <symbol id="i-show" viewBox="0 0 24 24"><path d="M3 12s3.5-7 9-7 9 7 9 7-3.5 7-9 7-9-7-9-7Z"/><circle cx="12" cy="12" r="3"/></symbol>
+    <symbol id="i-power" viewBox="0 0 24 24"><path d="M12 3.5v8M6.3 6.8a8 8 0 1 0 11.4 0"/></symbol>
+    <symbol id="i-offline" viewBox="0 0 24 24"><path d="M3 3l18 18M8.5 16.5a5 5 0 0 1 7-.1M5 12.9a10 10 0 0 1 5-2.7M19 12.9a10 10 0 0 0-2.2-1.5M2 8.8a15 15 0 0 1 4.2-2.6M22 8.8A15 15 0 0 0 11 5"/></symbol>
+    <symbol id="i-settings" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1Z"/></symbol>
+    <symbol id="i-monitor" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="12" rx="2"/><path d="M8 20h8M12 16v4"/></symbol>
+    <symbol id="i-moon" viewBox="0 0 24 24"><path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5Z"/></symbol>
+    <symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2.5v2M12 19.5v2M4.6 4.6 6 6M18 18l1.4 1.4M2.5 12h2M19.5 12h2M4.6 19.4 6 18M18 6l1.4-1.4"/></symbol>
+    <symbol id="i-pencil" viewBox="0 0 24 24"><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L8 18l-4 1 1-4Z"/></symbol>
+    <symbol id="i-download" viewBox="0 0 24 24"><path d="M12 4v11M7 10.5l5 5 5-5M5 19.5h14"/></symbol>
+    <symbol id="i-x" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></symbol>
+  </svg>
+
+  <header class="titlebar">
+    <svg class="mark" viewBox="0 0 32 32" aria-hidden="true">
+      <circle cx="12" cy="16" r="8.5" fill="url(#g-mark)" opacity=".55"/>
+      <circle cx="20" cy="16" r="8.5" fill="url(#g-mark)"/>
+    </svg>
+    <span class="wordmark">Personae</span>
+  </header>
+
+  <main class="app">
+    <section class="hero">
+      <div class="eyebrow">
+        <span class="status-dot" id="steam-dot"></span>
+        <span id="steam-status">Checking Steam…</span>
+        <span class="sep">·</span>
+        <span id="account-count"></span>
+      </div>
+      <div class="hero-row">
+        <h1>Who's playing?</h1>
+        <button class="icon-btn" id="settings-btn" title="Settings (Ctrl+,)"><svg><use href="#i-settings"/></svg></button>
+        <button class="icon-btn" id="menu-btn" title="More" aria-haspopup="menu"><svg><use href="#i-more"/></svg></button>
+      </div>
+      <label class="search">
+        <svg><use href="#i-search"/></svg>
+        <input id="search" type="search" placeholder="Search accounts" autocomplete="off" spellcheck="false">
+        <kbd>/</kbd>
+      </label>
+    </section>
+
+    <ul class="accounts" id="accounts" role="listbox" aria-label="Steam accounts"></ul>
+
+    <div class="empty" id="empty" hidden>
+      <div class="empty-art">
+        <svg viewBox="0 0 32 32"><circle cx="12" cy="16" r="8.5" fill="url(#g-mark)" opacity=".35"/><circle cx="20" cy="16" r="8.5" fill="url(#g-mark)" opacity=".7"/></svg>
+      </div>
+      <h2 id="empty-title">No saved accounts yet</h2>
+      <p id="empty-body">Sign in to Steam with <b>Remember me</b> ticked and the account will show up here.</p>
+    </div>
+
+    <div class="update-banner" id="update-banner" role="status" hidden>
+      <svg><use href="#i-download"/></svg>
+      <span class="update-text" id="update-text"></span>
+      <button class="btn btn-primary small" id="update-action"></button>
+      <button class="icon-btn" id="update-dismiss" title="Not now"><svg><use href="#i-x"/></svg></button>
+    </div>
+
+    <footer class="footer">
+      <button class="btn btn-secondary" id="add-btn">
+        <svg><use href="#i-plus"/></svg> Add account
+      </button>
+      <button class="btn btn-play" id="launch-btn">
+        <svg><use href="#i-play"/></svg> <span id="launch-label">Launch Steam</span>
+      </button>
+    </footer>
+  </main>
+
+  <!-- ===== Settings ===== -->
+  <section class="page" id="settings" hidden aria-labelledby="settings-title">
+    <header class="page-head">
+      <button class="icon-btn" id="settings-back" title="Back (Esc)"><svg><use href="#i-back"/></svg></button>
+      <h2 id="settings-title">Settings</h2>
+    </header>
+
+    <div class="page-body">
+      <h3 class="section">Appearance</h3>
+      <div class="group">
+        <div class="row stack">
+          <div class="row-title">Mode</div>
+          <div class="segmented" role="radiogroup" data-setting="mode">
+            <button role="radio" data-value="system"><svg><use href="#i-monitor"/></svg>System</button>
+            <button role="radio" data-value="dark"><svg><use href="#i-moon"/></svg>Dark</button>
+            <button role="radio" data-value="light"><svg><use href="#i-sun"/></svg>Light</button>
+          </div>
+        </div>
+        <div class="row stack">
+          <div class="row-title">Official themes</div>
+          <div class="themes" role="radiogroup" aria-label="Official themes" id="official-themes"></div>
+        </div>
+        <div class="row stack">
+          <div class="row-text">
+            <div class="row-title">Custom themes</div>
+            <div class="row-sub">Pick three colours; light and dark versions are made for you.</div>
+          </div>
+          <div class="themes" role="radiogroup" aria-label="Custom themes" id="custom-themes"></div>
+        </div>
+        <div class="row">
+          <div class="row-text"><div class="row-title">Compact list</div><div class="row-sub">Smaller rows to fit more accounts</div></div>
+          <button class="switch" role="switch" data-setting="compact" aria-label="Compact list"></button>
+        </div>
+        <div class="row">
+          <div class="row-text"><div class="row-title">Show login names</div><div class="row-sub">Turn off when streaming or sharing your screen</div></div>
+          <button class="switch" role="switch" data-setting="showLoginNames" aria-label="Show login names"></button>
+        </div>
+      </div>
+
+      <h3 class="section">Switching</h3>
+      <div class="group">
+        <div class="row stack">
+          <div class="row-title">After switching</div>
+          <div class="segmented" role="radiogroup" data-setting="afterSwitch">
+            <button role="radio" data-value="stay">Stay open</button>
+            <button role="radio" data-value="minimise">Minimise</button>
+            <button role="radio" data-value="tray">Hide to tray</button>
+          </div>
+        </div>
+        <div class="row">
+          <div class="row-text"><div class="row-title">Warn when a game is running</div><div class="row-sub">Switching closes Steam, which can close your game</div></div>
+          <button class="switch" role="switch" data-setting="warnInGame" aria-label="Warn when a game is running"></button>
+        </div>
+        <div class="row stack">
+          <div class="row-text">
+            <div class="row-title">Steam launch options</div>
+            <div class="row-sub">Passed to Steam whenever Personae starts it, e.g. <b>-silent</b> to start minimised</div>
+          </div>
+          <input class="field" data-setting="launchArgs" placeholder="-silent" spellcheck="false" autocomplete="off">
+        </div>
+      </div>
+
+      <h3 class="section">Window &amp; tray</h3>
+      <div class="group">
+        <div class="row stack">
+          <div class="row-title">Closing the window</div>
+          <div class="segmented" role="radiogroup" data-setting="closeTo">
+            <button role="radio" data-value="tray">Keep running in tray</button>
+            <button role="radio" data-value="quit">Quit Personae</button>
+          </div>
+        </div>
+        <div class="row" id="row-login">
+          <div class="row-text"><div class="row-title">Start with Windows</div><div class="row-sub" id="login-sub">Open Personae when you sign in</div></div>
+          <button class="switch" role="switch" data-setting="openAtLogin" aria-label="Start with Windows"></button>
+        </div>
+        <div class="row" id="row-hidden">
+          <div class="row-text"><div class="row-title">Start hidden in tray</div><div class="row-sub">When starting with Windows</div></div>
+          <button class="switch" role="switch" data-setting="startHidden" aria-label="Start hidden in tray"></button>
+        </div>
+      </div>
+
+      <h3 class="section">Updates</h3>
+      <div class="group">
+        <div class="row">
+          <div class="row-text"><div class="row-title" id="update-title">Personae</div><div class="row-sub" id="update-sub"></div></div>
+          <button class="btn btn-secondary small" id="update-btn">Check now</button>
+        </div>
+        <div class="row" id="row-autoupdate">
+          <div class="row-text"><div class="row-title">Update automatically</div><div class="row-sub" id="autoupdate-sub"></div></div>
+          <button class="switch" role="switch" data-setting="autoUpdate" aria-label="Update automatically"></button>
+        </div>
+      </div>
+
+      <h3 class="section">Data</h3>
+      <div class="group">
+        <div class="row">
+          <div class="row-text"><div class="row-title">Cached avatars</div><div class="row-sub">Re-download profile pictures from Steam</div></div>
+          <button class="btn btn-secondary small" id="clear-avatars">Clear</button>
+        </div>
+        <div class="row">
+          <div class="row-text"><div class="row-title">Reset settings</div><div class="row-sub">Custom themes and hidden accounts are kept</div></div>
+          <button class="btn btn-secondary small" id="reset-settings">Reset</button>
+        </div>
+      </div>
+
+      <p class="about" id="about">Personae · Not affiliated with Valve or Steam</p>
+    </div>
+  </section>
+
+  <!-- ===== Switching overlay ===== -->
+  <div class="overlay" id="overlay" hidden>
+    <div class="switch-card">
+      <div class="switch-avatar" id="switch-avatar"></div>
+      <div class="switch-kicker" id="switch-kicker">Signing in as</div>
+      <div class="switch-name" id="switch-name"></div>
+      <ol class="steps">
+        <li data-step="closing">Closing Steam</li>
+        <li data-step="updating">Updating sign-in</li>
+        <li data-step="starting">Starting Steam</li>
+      </ol>
+    </div>
+  </div>
+
+  <!-- ===== Dialogs ===== -->
+  <div class="scrim" id="confirm" hidden>
+    <div class="dialog" role="alertdialog" aria-labelledby="confirm-title" aria-describedby="confirm-body">
+      <h2 id="confirm-title"></h2>
+      <p id="confirm-body"></p>
+      <div class="dialog-actions">
+        <span class="spacer"></span>
+        <button class="btn btn-secondary small" id="confirm-cancel">Cancel</button>
+        <button class="btn btn-danger small" id="confirm-ok"></button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Transparent scrim so the whole app behind it shows the theme live while editing. -->
+  <div class="scrim see-through" id="theme-editor" hidden>
+    <div class="dialog" role="dialog" aria-labelledby="te-title">
+      <h2 id="te-title">New theme</h2>
+      <p>Changes preview live behind this panel.</p>
+      <div class="editor-fields">
+        <div>
+          <label class="editor-label" for="te-name">Name</label>
+          <input class="field plain" id="te-name" maxlength="24" placeholder="My theme" autocomplete="off">
+        </div>
+        <div>
+          <span class="editor-label">Accent</span>
+          <div class="color-row" data-color="accent"></div>
+        </div>
+        <div>
+          <span class="editor-label">Background tint</span>
+          <div class="color-row" data-color="base"></div>
+        </div>
+        <div>
+          <span class="editor-label">Play button</span>
+          <div class="color-row" data-color="play"></div>
+        </div>
+      </div>
+      <div class="dialog-actions">
+        <button class="btn btn-ghost danger small" id="te-delete">Delete</button>
+        <span class="spacer"></span>
+        <button class="btn btn-secondary small" id="te-cancel">Cancel</button>
+        <button class="btn btn-primary small" id="te-save">Save theme</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="menu" id="menu" role="menu" hidden></div>
+  <div class="toasts" id="toasts" aria-live="polite"></div>
+
+  <template id="account-tpl">
+    <li class="account" role="option" tabindex="-1">
+      <div class="avatar"><img alt=""><span class="initials"></span></div>
+      <div class="who">
+        <div class="persona"></div>
+        <div class="login"></div>
+      </div>
+      <div class="side">
+        <span class="meta"></span>
+        <span class="go"><svg><use href="#i-arrow"/></svg></span>
+        <button class="icon-btn more" title="Account options" tabindex="-1"><svg><use href="#i-more"/></svg></button>
+      </div>
+    </li>
+  </template>
+
+  <template id="swatch-tpl">
+    <button class="swatch" role="radio">
+      <span class="swatch-art"><span class="sw-card"><i></i><b></b></span><span class="sw-play"></span></span>
+      <span class="swatch-name"></span>
+    </button>
+  </template>
+
+  <script src="mock.js"></script>
+  <script src="themes.js"></script>
+  <script src="app.js"></script>
+  <script src="settings.js"></script>
+  <script src="updates.js"></script>
+</body>
+</html>
