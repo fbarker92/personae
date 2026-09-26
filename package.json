@@ -1,7 +1,7 @@
 {
   "name": "personae",
   "productName": "Personae",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "A small, modern Steam account switcher",
   "author": "Fergus Barker",
   "repository": "https://github.com/fbarker92/personae",
