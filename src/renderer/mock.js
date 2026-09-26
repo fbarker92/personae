@@ -3,11 +3,11 @@
 if (!window.personae) {
   const now = Date.now() / 1000;
   const accounts = [
-    { steamId: '76561198000000001', accountName: 'ergonomichamster', personaName: 'ergonomicHamster', timestamp: now - 3600, active: true },
-    { steamId: '76561198000000002', accountName: 'hamster_smurf', personaName: 'Definitely Not Hamster', timestamp: now - 86400 * 2 },
-    { steamId: '76561198000000003', accountName: 'family_shared', personaName: 'The Barker Household', timestamp: now - 86400 * 9 },
-    { steamId: '76561198000000004', accountName: 'dev_testing', personaName: 'build-bot', timestamp: now - 86400 * 45, offline: true },
-    { steamId: '76561198000000005', accountName: 'old_main_2014', personaName: 'xX_Hamster_Xx', timestamp: now - 86400 * 400 },
+    { steamId: '76561198000000001', accountName: 'nightowl_82', personaName: 'NightOwl', timestamp: now - 3600, active: true },
+    { steamId: '76561198000000002', accountName: 'orbit_kit', personaName: 'OrbitingOtter', timestamp: now - 86400 * 2 },
+    { steamId: '76561198000000003', accountName: 'couch_coop', personaName: 'CouchCoopCrew', timestamp: now - 86400 * 9 },
+    { steamId: '76561198000000004', accountName: 'quiet_packet', personaName: 'QuietPacket', timestamp: now - 86400 * 45, offline: true },
+    { steamId: '76561198000000005', accountName: 'bluehour_27', personaName: 'BlueHourPilot', timestamp: now - 86400 * 400 },
   ].map(a => ({ remembered: true, offline: false, active: false, avatar: null, ...a }));
 
   let running = true;

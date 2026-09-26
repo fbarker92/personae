@@ -1,132 +1,94 @@
 # Personae
 
-A small, modern Steam account switcher for Windows.
+**A lightweight Steam account switcher for Windows.** Browse your saved Steam accounts, choose one, and let Personae restart Steam into that account—without manually editing configuration files or signing out and back in each time.
 
-## Run
+Personae is an independent community project and is not affiliated with Valve or Steam.
+
+## Screenshots
+
+<table>
+	<tr>
+		<td><img src="docs/screenshots/accounts.png" alt="Personae account list with saved accounts, search, and Steam controls" width="360"></td>
+		<td><img src="docs/screenshots/settings.png" alt="Personae settings with appearance, theme, switching, tray, and update options" width="360"></td>
+	</tr>
+</table>
+
+## What it does
+
+- **Switches between remembered Steam accounts.** Personae finds accounts saved by Steam and starts Steam with the account you choose. Account switching only works without a password prompt when Steam still has a valid remembered login.
+- **Adds accounts.** Open Steam's sign-in screen from Personae, sign in with **Remember me**, and the account will appear in the list.
+- **Keeps account controls close at hand.** Search and keyboard shortcuts make the list quick to use; the tray menu also provides account switching, add-account, and Steam launch actions.
+- **Fits your setup.** Choose light, dark, or system mode; use one of five built-in themes or create a custom palette; hide login names, compact the list, and control what happens after switching or closing the window.
+- **Stays out of the way.** Keep Personae in the system tray and optionally start it with Windows (packaged app only).
+- **Warns before a switch closes a running game.** When enabled, Personae checks Steam's running-game status before switching.
+- **Checks for app updates.** The installer build can download and install updates; portable and MSI builds link to the release instead.
+
+## Getting started
+
+Download the latest **Personae-Setup** installer from [GitHub Releases](https://github.com/fbarker92/personae/releases). The installer is per-user and does not require administrator access. MSI and portable builds are also available for each release.
+
+After installation, open Personae and select a saved account. To add another account, choose **Add account**, sign in to Steam, and tick **Remember me**. Personae uses Steam's locally remembered sign-ins; it does not bypass Steam authentication or recover account passwords.
+
+The application is currently distributed unsigned, so Windows SmartScreen may show a warning on first launch.
+
+## Using Personae
+
+Click an account to switch. Personae asks Steam to close, updates Steam's selected remembered account, and starts Steam again. If Steam requests a password, complete the sign-in in Steam and select **Remember me** for future switches. A backup is kept when Personae updates Steam's `loginusers.vdf` file.
+
+The tray icon opens the app with a left-click. Right-click it for quick account switching, **Add account**, **Launch/Open Steam**, and **Quit**. Closing the main window keeps Personae in the tray by default; this can be changed in Settings.
+
+### Keyboard shortcuts
+
+| Shortcut | Action |
+| --- | --- |
+| `↑` / `↓`, then `Enter` | Select and switch accounts |
+| `1`–`9` | Switch to an account by position |
+| `/` or `Ctrl+F` | Search accounts |
+| `Ctrl+N` | Add an account |
+| `Ctrl+,` | Open Settings |
+| `F5` | Refresh the account list |
+| Right-click an account | Open profile, copy SteamID, or hide account |
+
+## Settings
+
+Open Settings with the gear button, `Ctrl+,`, or the tray menu. Settings include:
+
+- **Appearance:** System, dark, or light mode; Steam, Deck, Classic, Midnight, and Neon themes; custom themes; compact account rows; and an option to hide login names.
+- **Switching:** Stay open, minimise, or hide to tray after switching; warn when a game is running; and pass launch options to Steam (for example, `-silent`).
+- **Window and tray:** Choose whether closing the window hides or quits the app; packaged builds can start with Windows, optionally hidden in the tray.
+- **Updates and data:** Check for updates, control automatic downloads, clear cached avatars, or reset settings. Reset keeps custom themes and hidden accounts.
+
+## Build from source
+
+Personae uses Electron and electron-builder. To run the app in development:
 
 ```bash
 npm install
 npm start
 ```
 
-If `npm start` complains that Electron failed to install, fetch its binary manually:
-
-```bash
-node node_modules/electron/install.js
-```
-
-## Build for release
+To build Windows packages locally:
 
 ```bash
 npm run dist
 ```
 
-This writes three packages to `dist/`:
+The packages are written to `dist/`:
 
-| File | What it's for |
+| Package | Purpose |
 | --- | --- |
-| `Personae-Setup-<version>.exe` | Installer for most people. Per-user, no admin needed, lets you pick the folder |
-| `Personae-<version>.msi` | Installs for all users (needs admin); suits Intune/GPO deployment |
-| `Personae-<version>-portable.exe` | Runs without installing |
+| `Personae-Setup-<version>.exe` | Per-user installer with folder selection |
+| `Personae-<version>.msi` | Per-machine installer; requires administrator rights |
+| `Personae-<version>-portable.exe` | Portable executable; no installation |
 
-`npm run dist:setup`, `dist:msi` and `dist:portable` build just one. Bump `version` in `package.json` before
-each release; installers upgrade in place.
+Use `npm run dist:setup`, `npm run dist:msi`, or `npm run dist:portable` to build only one package.
 
-## Releases and auto-update
+## Releases
 
-Personae updates itself from GitHub Releases on the repo named in `package.json` → `repository`.
+Pushing a version tag such as `v0.2.0` starts the [Release GitHub Actions workflow](.github/workflows/release.yml). The tag must match the `version` in `package.json`. Actions builds the Windows packages and uploads them to a draft GitHub Release; publish the draft when it is ready. The workflow uses GitHub's automatically provided token.
 
-**One-time setup:** create a **public** GitHub repo (the app can't read a private repo's releases), replace
-`YOUR_GITHUB_USERNAME` in `repository` with your username, and push this project to it. Until then, builds
-show "Updates aren't set up for this build".
+The app checks public releases from the repository configured in `package.json`. For a fork, point that field to the fork's public repository if you want its builds to use their own update channel.
 
-**Each release:**
+## Preview the UI
 
-1. Bump `version` in `package.json` (e.g. `0.2.0`) and commit
-2. Tag and push: `git tag v0.2.0 && git push origin main v0.2.0`
-3. The *Release* workflow (`.github/workflows/release.yml`) builds on Windows and uploads everything to a
-   **draft** release. Review it on GitHub and click **Publish**; installed copies pick it up within 6 hours,
-   or straight away via Settings → Updates → Check now.
-
-**What each build does with an update:**
-
-| Build | Behaviour |
-| --- | --- |
-| Setup `.exe` | Downloads in the background, then offers *Restart* (banner, Settings and tray). Installs on quit if you don't |
-| `.msi` / portable | Shows that a new version exists; *Get it* opens the release page. (electron-updater can't replace these in place — MSI updates are for your deployment tool) |
-
-Turning off **Update automatically** in Settings stops background checks; *Check now* still works.
-
-The builds aren't code-signed, so Windows SmartScreen will warn on first run ("More info → Run anyway").
-To sign, add a certificate via electron-builder's `win.signtoolOptions` or Azure Trusted Signing (`win.azureSignOptions`).
-
-## How switching works
-
-Steam signs into whichever account `HKCU\Software\Valve\Steam\AutoLoginUser` names, as long as that account has a
-remembered login. To switch, Personae:
-
-1. asks Steam to shut down (`steam.exe -shutdown`), force-closing it after 20 s if needed
-2. sets `AutoLoginUser` and `RememberPassword`
-3. marks the account as most recent in `<Steam>\config\loginusers.vdf` (a backup is kept as `loginusers.vdf.personae.bak`)
-4. starts Steam again
-
-**Add account** clears `AutoLoginUser`, so Steam opens on its sign-in screen. Tick *Remember me* and the account
-will appear in the list next time.
-
-Accounts only switch silently if Steam still holds a valid remembered login for them. If Steam asks for a
-password, sign in once with *Remember me* ticked.
-
-## Tray
-
-Personae lives in the system tray. Closing the window hides it there; **Quit** is in the tray menu.
-
-- **Left-click** the icon to open the window
-- **Right-click** for quick switching: your accounts (the current one ticked), *Add account…*, *Launch/Open Steam*,
-  and *Start with Windows* (packaged builds only, starts hidden in the tray)
-
-Accounts hidden in the window are left out of the tray menu too. Switches started from the tray show their
-progress in the window if it's open, and a Windows notification if something goes wrong while it's hidden.
-
-## Settings
-
-Open with the gear icon, `Ctrl+,`, or **Settings** in the tray menu. Stored in `%APPDATA%\Personae\settings.json`.
-
-- **Appearance**: System / Dark / Light mode; official themes (Steam, Deck, Classic, Midnight, Neon); custom
-  themes built from three colours (accent, background tint, play button) with a live preview; compact list;
-  hide login names (for streaming)
-- **Switching**: stay open, minimise or hide to tray afterwards; warn when a game is running (Personae reads
-  `RunningAppID` and looks the name up in your library); Steam launch options such as `-silent`
-- **Window & tray**: whether closing the window hides to the tray or quits; start with Windows, optionally
-  hidden (packaged builds only)
-- **Data**: clear cached avatars; reset settings (keeps custom themes and hidden accounts)
-
-## Keyboard
-
-| Key | Action |
-| --- | --- |
-| `↑` `↓` / `Enter` | Pick and switch |
-| `1`–`9` | Switch to the nth account |
-| `/` or `Ctrl+F` | Search |
-| `Ctrl+N` | Add account |
-| `Ctrl+,` | Settings |
-| `F5` | Refresh |
-| Right-click an account | Profile, copy SteamID, hide |
-
-## Developing the UI
-
-`npm run preview` serves `src/renderer` at http://localhost:5173 with mock accounts (`mock.js`), so the UI can be
-worked on in a normal browser without touching Steam. Add `?game` to the URL to simulate a running game, or
-`?update=available|downloading|ready|current|error` to see the update states.
-
-## Layout
-
-```
-src/main.js        Electron window, tray menu + IPC
-src/settings.js    persisted settings with defaults and validation
-src/updater.js     GitHub Releases auto-update (electron-updater)
-src/renderer/themes.js    official theme palettes + the custom theme generator
-src/assets/        app and tray icons (regenerate with scripts/make-icons.ps1)
-src/preload.js     the window.personae bridge
-src/steam.js       registry, loginusers.vdf, steam.exe process control
-src/renderer/      the UI
-```
+Run `npm run preview` and open [http://localhost:5173](http://localhost:5173) to explore the interface with fictional demo accounts. The preview runs in a browser without connecting to Steam. Add `?game` to simulate a running game, or `?update=available`, `?update=downloading`, `?update=ready`, `?update=current`, or `?update=error` to preview update states.
