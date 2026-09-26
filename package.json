@@ -4,7 +4,7 @@
   "version": "0.1.0",
   "description": "A small, modern Steam account switcher",
   "author": "Fergus Barker",
-  "repository": "https://github.com/YOUR_GITHUB_USERNAME/personae",
+  "repository": "https://github.com/fbarker92/personae",
   "main": "src/main.js",
   "private": true,
   "scripts": {
