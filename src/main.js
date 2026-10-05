@@ -167,6 +167,12 @@ function beforeInstall(version) {
   settings.update({ justUpdated: { from: app.getVersion(), to: version, hidden: !windowVisible() }, dismissedUpdate: '' });
 }
 
+// The installer never started, so Personae is still running: forget the pending relaunch and don't retry
+// this version automatically (Install now still works).
+function installFailed(version) {
+  settings.update({ justUpdated: null, skipAutoInstall: version });
+}
+
 // Runs at startup: did the update we started last time actually install?
 function readUpdateOutcome() {
   const last = settings.get().justUpdated;
@@ -317,6 +323,7 @@ app.whenReady().then(() => {
     isIdle: idleForUpdate,
     shouldAutoInstall: version => settings.get().skipAutoInstall !== version,
     beforeInstall,
+    installFailed,
     onChange: state => {
       send('updates:changed', state);
       if (state.status !== lastStatus) { lastStatus = state.status; refreshTray(); }

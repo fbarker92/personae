@@ -57,6 +57,7 @@ let hooks = {
   isIdle: async () => false,
   shouldAutoInstall: () => true,
   beforeInstall: () => {},
+  installFailed: () => {},
 };
 let pending = null; // MSI / portable: { version, asset, file }
 let checkTimer;
@@ -200,8 +201,12 @@ function install() {
     packagePath: pending.file,
     target: kind === 'portable' ? process.env.PORTABLE_EXECUTABLE_FILE : process.execPath,
     workDir: workDir(),
-  });
-  setTimeout(() => app.quit(), 300); // the install script waits for this process to exit
+  })
+    .then(() => app.quit()) // the install script waits for this process to exit
+    .catch(err => {
+      hooks.installFailed(state.version);
+      set({ status: 'error', error: shortError(err) });
+    });
 }
 
 let tryingIdle = false;

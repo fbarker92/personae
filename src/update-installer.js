@@ -59,9 +59,11 @@ Write-Log 'Relaunched Personae'
 `;
 
 /**
- * Hands the install to a detached script and returns; the caller should quit straight after.
+ * Hands the install to a background script. Resolves once the script is running independently of Personae,
+ * at which point the caller should quit; rejects if it couldn't be started.
  * @param {{ kind: 'msi' | 'portable', packagePath: string, target: string, workDir: string }} opts
  *   target: the .exe to relaunch (and, for portable, to overwrite)
+ * @returns {Promise<void>}
  */
 function runDetachedInstall({ kind, packagePath, target, workDir }) {
   fs.mkdirSync(workDir, { recursive: true });
@@ -70,7 +72,7 @@ function runDetachedInstall({ kind, packagePath, target, workDir }) {
   fs.writeFileSync(script, '﻿' + SCRIPT, 'utf8');
 
   const args = [
-    '-NoProfile', '-NonInteractive', '-ExecutionPolicy', 'Bypass', '-WindowStyle', 'Hidden',
+    'powershell.exe', '-NoProfile', '-NonInteractive', '-ExecutionPolicy', 'Bypass', '-WindowStyle', 'Hidden',
     '-File', script,
     '-Kind', kind,
     '-WaitPid', String(process.pid),
@@ -80,7 +82,17 @@ function runDetachedInstall({ kind, packagePath, target, workDir }) {
   ];
   if (kind === 'msi') args.push('-InstallDir', path.dirname(target));
 
-  spawn('powershell.exe', args, { detached: true, stdio: 'ignore', windowsHide: true }).unref();
+  // Node puts ordinary child processes in a job that's killed when Personae exits, and a `detached`
+  // powershell.exe has no console, which some machines' PowerShell won't run without. So cmd's START
+  // launches it instead: cmd stays in the job and exits at once, while powershell (a grandchild) is allowed
+  // out of the job and shares cmd's hidden console. Windows paths can't contain double quotes, so quoting
+  // each argument is enough; /s strips the outer quotes from the /c line.
+  const line = `"start "" /b ${args.map(a => `"${a}"`).join(' ')}"`;
+  return new Promise((resolve, reject) => {
+    spawn('cmd.exe', ['/d', '/s', '/c', line], { stdio: 'ignore', windowsHide: true, windowsVerbatimArguments: true })
+      .on('error', reject)
+      .on('exit', code => (code === 0 ? resolve() : reject(new Error(`Couldn't start the installer (cmd exited ${code})`))));
+  });
 }
 
 module.exports = { runDetachedInstall };
