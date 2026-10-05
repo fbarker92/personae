@@ -80,6 +80,7 @@
     <div class="update-banner" id="update-banner" role="status" hidden>
       <svg><use href="#i-download"/></svg>
       <span class="update-text" id="update-text"></span>
+      <button class="link" id="update-notes">Release notes</button>
       <button class="btn btn-primary small" id="update-action"></button>
       <button class="icon-btn" id="update-dismiss" title="Not now"><svg><use href="#i-x"/></svg></button>
     </div>
@@ -178,12 +179,20 @@
       <h3 class="section">Updates</h3>
       <div class="group">
         <div class="row">
-          <div class="row-text"><div class="row-title" id="update-title">Personae</div><div class="row-sub" id="update-sub"></div></div>
+          <div class="row-text">
+            <div class="row-title" id="update-title">Personae</div>
+            <div class="row-sub" id="update-sub"></div>
+            <button class="link row-link" id="update-notes-settings">Release notes</button>
+          </div>
           <button class="btn btn-secondary small" id="update-btn">Check now</button>
         </div>
-        <div class="row" id="row-autoupdate">
-          <div class="row-text"><div class="row-title">Update automatically</div><div class="row-sub" id="autoupdate-sub"></div></div>
-          <button class="switch" role="switch" data-setting="autoUpdate" aria-label="Update automatically"></button>
+        <div class="row stack" id="row-updatemode">
+          <div class="row-text"><div class="row-title">New versions</div><div class="row-sub" id="updatemode-sub"></div></div>
+          <div class="segmented" role="radiogroup" data-setting="updateMode">
+            <button role="radio" data-value="auto">Automatic</button>
+            <button role="radio" data-value="ask">Ask first</button>
+            <button role="radio" data-value="manual">Check only</button>
+          </div>
         </div>
       </div>
 

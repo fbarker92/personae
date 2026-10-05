@@ -19,8 +19,10 @@ const DEFAULTS = {
   openAtLogin: false,
   startHidden: true,
   // updates
-  autoUpdate: true,
+  updateMode: 'auto', // auto (download + install when idle) | ask (download, then ask) | manual (check only)
   dismissedUpdate: '', // version whose banner the user closed
+  justUpdated: null, // { from, to, hidden } written just before installing, read on the next launch
+  skipAutoInstall: '', // a version whose install didn't take (e.g. admin prompt declined); only install it on request
   // bookkeeping
   hiddenAccounts: [],
   trayHintShown: false,
@@ -30,7 +32,15 @@ const ENUMS = {
   mode: ['system', 'dark', 'light'],
   afterSwitch: ['stay', 'minimise', 'tray'],
   closeTo: ['tray', 'quit'],
+  updateMode: ['auto', 'ask', 'manual'],
 };
+
+const VERSION = /^\d+\.\d+\.\d+$/;
+
+function sanitizeJustUpdated(v) {
+  if (!v || typeof v !== 'object' || !VERSION.test(v.from) || !VERSION.test(v.to)) return null;
+  return { from: v.from, to: v.to, hidden: Boolean(v.hidden) };
+}
 
 const HEX = /^#[0-9a-f]{6}$/i;
 
@@ -41,6 +51,9 @@ function sanitizeTheme(t) {
 }
 
 function sanitize(input) {
+  // 0.1.x stored a boolean "autoUpdate"; turning it off meant check-only.
+  if (input.updateMode === undefined && input.autoUpdate === false) input = { ...input, updateMode: 'manual' };
+
   const out = { ...DEFAULTS };
   for (const key of Object.keys(DEFAULTS)) {
     const value = input[key];
@@ -49,6 +62,7 @@ function sanitize(input) {
     if (ENUMS[key]) { if (ENUMS[key].includes(value)) out[key] = value; }
     else if (key === 'customThemes') out[key] = Array.isArray(value) ? value.map(sanitizeTheme).filter(Boolean).slice(0, 30) : def;
     else if (key === 'hiddenAccounts') out[key] = Array.isArray(value) ? value.map(String).filter(id => /^\d{17}$/.test(id)) : def;
+    else if (key === 'justUpdated') out[key] = sanitizeJustUpdated(value);
     else if (typeof def === 'boolean') out[key] = Boolean(value);
     else if (typeof def === 'string') out[key] = String(value).slice(0, 300);
   }
@@ -76,8 +90,8 @@ function update(patch) {
 
 // Appearance and behaviour go back to defaults; custom themes, hidden accounts and one-off hints are kept.
 function reset() {
-  const { customThemes, hiddenAccounts, trayHintShown, dismissedUpdate } = get();
-  return update({ ...DEFAULTS, customThemes, hiddenAccounts, trayHintShown, dismissedUpdate });
+  const { customThemes, hiddenAccounts, trayHintShown, dismissedUpdate, justUpdated, skipAutoInstall } = get();
+  return update({ ...DEFAULTS, customThemes, hiddenAccounts, trayHintShown, dismissedUpdate, justUpdated, skipAutoInstall });
 }
 
 module.exports = { get, update, reset, DEFAULTS };

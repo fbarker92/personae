@@ -36,6 +36,7 @@
 :root[data-mode="light"] { color-scheme: light; }
 
 * { box-sizing: border-box; }
+[hidden] { display: none !important; }
 
 html, body { height: 100%; margin: 0; }
 
@@ -335,8 +336,27 @@ kbd {
 }
 .update-banner[hidden] { display: none; }
 .update-banner > svg { width: 17px; height: 17px; color: var(--accent); }
-.update-text { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.update-banner .btn[hidden] { display: none; }
+.update-text {
+  flex: 1; min-width: 0;
+  font-size: 12.5px; line-height: 1.3;
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+}
+.update-banner .btn[hidden], .link[hidden] { display: none; }
+
+/* Text-style button for secondary actions such as "Release notes". */
+.link {
+  flex: none;
+  padding: 2px 0;
+  border: 0;
+  background: none;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--accent);
+  white-space: nowrap;
+}
+.link:hover { text-decoration: underline; text-underline-offset: 2px; }
+.row-link { margin-top: 4px; font-size: 12px; }
+.segmented button:disabled { opacity: 0.45; cursor: not-allowed; }
 .update-banner .icon-btn { width: 28px; height: 28px; }
 .update-banner .icon-btn svg { width: 15px; height: 15px; }
 
@@ -732,6 +752,7 @@ kbd {
 .toast.error { border-color: color-mix(in srgb, var(--danger) 45%, transparent); }
 .toast.error svg { color: var(--danger); }
 .toast.out { opacity: 0; transform: translateY(6px); transition: 0.2s; }
+.toast.has-action { pointer-events: auto; }
 
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }

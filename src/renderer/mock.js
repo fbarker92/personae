@@ -29,7 +29,7 @@ if (!window.personae) {
   const DEFAULT_SETTINGS = {
     mode: 'system', theme: 'steam', customThemes: [], compact: false, showLoginNames: true,
     afterSwitch: 'stay', warnInGame: true, launchArgs: '', closeTo: 'tray', openAtLogin: false, startHidden: true,
-    autoUpdate: true, dismissedUpdate: '',
+    updateMode: 'auto', dismissedUpdate: '', justUpdated: null, skipAutoInstall: '',
     hiddenAccounts: [], trayHintShown: false,
   };
   const load = () => { try { return { ...DEFAULT_SETTINGS, ...JSON.parse(localStorage.getItem('mock:settings')) }; } catch { return { ...DEFAULT_SETTINGS }; } };
@@ -44,15 +44,21 @@ if (!window.personae) {
     onOpenSettings: () => {},
     // Add ?game to the preview URL to simulate a running game.
     runningGame: async () => (location.search.includes('game') ? { appId: 730, name: 'Counter-Strike 2' } : null),
-    // Add ?update=available|downloading|ready|current|error to the preview URL to simulate update states.
+    // ?update=available|downloading|ready|installing|current|error simulates an update state,
+    // &mode=auto|ask|manual the update setting, &kind=installer|msi|portable the build, and ?updated a post-update launch.
     updateState: async () => {
-      const status = new URLSearchParams(location.search).get('update') || 'current';
-      return { status, currentVersion: '0.1.0', version: '0.2.0', percent: 42, error: "Couldn't reach GitHub", lastChecked: Date.now() - 300000, canSelfUpdate: true };
+      const q = new URLSearchParams(location.search);
+      const kind = q.get('kind') || 'installer';
+      return {
+        status: q.get('update') || 'current', mode: q.get('mode') || settings.updateMode, kind, needsAdmin: kind === 'msi',
+        currentVersion: '0.1.3', version: '0.2.0', percent: 42, error: "Couldn't reach GitHub", lastChecked: Date.now() - 300000,
+      };
     },
+    takeUpdateOutcome: async () => (location.search.includes('updated') ? { ok: true, version: '0.1.3', from: '0.1.2' } : null),
     checkForUpdates: async () => {},
     downloadUpdate: async () => {},
     installUpdate: async () => {},
-    openRelease: async () => {},
+    openReleaseNotes: async version => window.open(`https://github.com/fbarker92/personae/releases/tag/v${version}`, '_blank'),
     onUpdateChanged: () => {},
     clearAvatarCache: async () => {},
     setChrome: async () => {},
