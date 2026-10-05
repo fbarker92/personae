@@ -21,7 +21,7 @@ Personae is an independent community project and is not affiliated with Valve or
 - **Fits your setup.** Choose light, dark, or system mode; use one of five built-in themes or create a custom palette; hide login names, compact the list, and control what happens after switching or closing the window.
 - **Stays out of the way.** Keep Personae in the system tray and optionally start it with Windows (packaged app only).
 - **Warns before a switch closes a running game.** When enabled, Personae checks Steam's running-game status before switching.
-- **Checks for app updates.** The installer build can download and install updates; portable and MSI builds link to the release instead.
+- **Updates itself in the background.** Installer, MSI and portable builds all download new releases and install them while Personae isn't in use, with a link to each release's notes.
 
 ## Getting started
 
@@ -56,7 +56,7 @@ Open Settings with the gear button, `Ctrl+,`, or the tray menu. Settings include
 - **Appearance:** System, dark, or light mode; Steam, Deck, Classic, Midnight, and Neon themes; custom themes; compact account rows; and an option to hide login names.
 - **Switching:** Stay open, minimise, or hide to tray after switching; warn when a game is running; and pass launch options to Steam (for example, `-silent`).
 - **Window and tray:** Choose whether closing the window hides or quits the app; packaged builds can start with Windows, optionally hidden in the tray.
-- **Updates and data:** Check for updates, control automatic downloads, clear cached avatars, or reset settings. Reset keeps custom themes and hidden accounts.
+- **Updates and data:** Check for updates, open release notes, choose how new versions are handled (**Automatic**, **Ask first** or **Check only**), clear cached avatars, or reset settings. Reset keeps custom themes and hidden accounts.
 
 ## Build from source
 
@@ -89,6 +89,20 @@ To cut a release, bump `version` in `package.json` and merge to `main`. The [Rel
 
 The app checks public releases from the repository configured in `package.json`. For a fork, point that field to the fork's public repository if you want its builds to use their own update channel.
 
+### How updates install
+
+Personae checks shortly after starting and every 4 hours. In **Automatic** mode it downloads in the background and installs once it's idle: no switch in progress, the window hidden, minimised or unfocused for 2 minutes, and no Steam game running. Then it relaunches the way it was, hidden or showing, and offers **What's new** for the release.
+
+| Build | How the update is applied |
+| --- | --- |
+| Setup `.exe` | electron-updater downloads (differentially) and runs the installer silently. It only asks for admin if Personae was installed somewhere that needs it |
+| `.msi` | Downloads the new `.msi`, checks its SHA-256 against the release, and runs `msiexec /passive` after Personae exits. Windows asks for admin because the MSI installs for all users |
+| Portable | Downloads the new portable `.exe`, checks it, and swaps it in once the portable launcher releases the old file. It only asks for admin if the folder is protected |
+
+If an install doesn't take, for example because the admin prompt was declined, Personae says so after relaunching and won't retry that version by itself. **Install now** in Settings → Updates still works. MSI and portable installs log to `%TEMP%\personae-update\install-update.log`.
+
 ## Preview the UI
 
-Run `npm run preview` and open [http://localhost:5173](http://localhost:5173) to explore the interface with fictional demo accounts. The preview runs in a browser without connecting to Steam. Add `?game` to simulate a running game, or `?update=available`, `?update=downloading`, `?update=ready`, `?update=current`, or `?update=error` to preview update states.
+Run `npm run preview` and open [http://localhost:5173](http://localhost:5173) to explore the interface with fictional demo accounts. The preview runs in a browser without connecting to Steam. Add `?game` to simulate a running game, or `?update=available`, `?update=downloading`, `?update=ready`, `?update=installing`, `?update=current`, or `?update=error` to preview update states. Combine with `&mode=auto|ask|manual` and `&kind=installer|msi|portable`, or add `?updated` to see the message shown after an update.
+
+To run a second copy alongside an installed one, set `PERSONAE_USER_DATA` to a separate folder; it gets its own settings and its own single-instance lock.

@@ -5,17 +5,23 @@ const steam = require('./steam');
 const settings = require('./settings');
 const updater = require('./updater');
 
+// A separate profile (settings, caches, single-instance lock) for testing alongside a real copy.
+if (process.env.PERSONAE_USER_DATA) app.setPath('userData', process.env.PERSONAE_USER_DATA);
+
 if (!app.requestSingleInstanceLock()) app.quit();
 app.setAppUserModelId('dev.personae.app'); // Windows attributes notifications and taskbar grouping to this id
 
 const ASSETS = path.join(__dirname, 'assets');
 const ICON = path.join(ASSETS, 'icon.png');
-const startHidden = process.argv.includes('--hidden');
+const UPDATE_IDLE_AFTER = 2 * 60 * 1000; // window unfocused this long counts as "not in use"
 
 let win;
 let tray;
 let quitting = false;
 let busy = false;
+let startHidden = process.argv.includes('--hidden');
+let blurredAt = 0;
+let updateOutcomeForWindow = null; // shown as a toast once the window asks for it
 
 // ---------- window ----------
 
@@ -42,6 +48,8 @@ function createWindow() {
   win.removeMenu();
   win.loadFile(path.join(__dirname, 'renderer', 'index.html'));
   win.once('ready-to-show', () => { if (!startHidden) win.show(); });
+  win.on('blur', () => { blurredAt = Date.now(); });
+  win.on('focus', () => { blurredAt = 0; });
 
   win.on('close', e => {
     if (quitting) return;
@@ -87,7 +95,7 @@ function applySettings(prev, next) {
     if (prev) app.setLoginItemSettings({ ...loginItem(prev), openAtLogin: false });
     app.setLoginItemSettings({ ...loginItem(next), openAtLogin: next.openAtLogin });
   }
-  if (prev && prev.autoUpdate !== next.autoUpdate) updater.setAutomatic(next.autoUpdate);
+  if (prev && prev.updateMode !== next.updateMode) updater.setMode(next.updateMode);
   refreshTray();
 }
 
@@ -143,6 +151,49 @@ async function switchFromTray(accountName) {
   performSwitch(accountName).catch(notifyError);
 }
 
+// ---------- updates ----------
+
+// Installing restarts Personae (and MSI updates bring up an admin prompt), so only do it when nobody's using
+// Personae and no game is running.
+async function idleForUpdate() {
+  if (busy || !win) return false;
+  const inUse = windowVisible() && (win.isFocused() || Date.now() - blurredAt < UPDATE_IDLE_AFTER);
+  if (inUse) return false;
+  return !(await steam.getRunningGame().catch(() => null));
+}
+
+// Remember how Personae looked so the relaunched version can come back the same way, and check it worked.
+function beforeInstall(version) {
+  settings.update({ justUpdated: { from: app.getVersion(), to: version, hidden: !windowVisible() }, dismissedUpdate: '' });
+}
+
+// Runs at startup: did the update we started last time actually install?
+function readUpdateOutcome() {
+  const last = settings.get().justUpdated;
+  if (!last) return null;
+  const ok = app.getVersion() === last.to;
+  settings.update({ justUpdated: null, ...(ok ? {} : { skipAutoInstall: last.to }) });
+  if (last.hidden) startHidden = true;
+  return { ok, version: last.to, from: last.from };
+}
+
+function announceUpdateOutcome(outcome) {
+  if (!startHidden) { updateOutcomeForWindow = outcome; return; }
+  if (!Notification.isSupported()) return;
+  const n = outcome.ok
+    ? new Notification({ title: `Personae updated to ${outcome.version}`, body: "Click to see what's new.", icon: ICON })
+    : new Notification({
+        title: `Personae ${outcome.version} wasn't installed`,
+        body: 'The update was cancelled or needs admin permission. You can install it from Settings → Updates.',
+        icon: ICON,
+      });
+  n.on('click', () => {
+    if (outcome.ok) updater.openNotes(outcome.version);
+    else { showWindow(); send('settings:open'); }
+  });
+  n.show();
+}
+
 // ---------- tray ----------
 
 // "&" marks a mnemonic in Windows menus, so double it to show a literal ampersand.
@@ -173,9 +224,12 @@ async function refreshTray() {
     : [{ label: 'No saved accounts', enabled: false }];
 
   const update = updater.getState();
-  const updateItems = update.status === 'ready'
-    ? [{ label: `Restart to update to ${update.version}`, click: () => updater.install() }, { type: 'separator' }]
-    : [];
+  const updateItems = [];
+  if (update.status === 'ready') updateItems.push({ label: `Install update ${update.version} now`, click: () => updater.install() });
+  if (['available', 'downloading', 'ready'].includes(update.status)) {
+    updateItems.push({ label: `Release notes for ${update.version}`, click: () => updater.openNotes(update.version) });
+  }
+  if (updateItems.length) updateItems.push({ type: 'separator' });
 
   tray.setContextMenu(Menu.buildFromTemplate([
     ...updateItems,
@@ -237,7 +291,12 @@ ipcMain.handle('updates:state', () => updater.getState());
 ipcMain.handle('updates:check', () => updater.check());
 ipcMain.handle('updates:download', () => updater.download());
 ipcMain.handle('updates:install', () => updater.install());
-ipcMain.handle('updates:openRelease', () => updater.openRelease());
+ipcMain.handle('updates:openNotes', (_, version) => updater.openNotes(String(version || '')));
+ipcMain.handle('updates:takeOutcome', () => {
+  const outcome = updateOutcomeForWindow;
+  updateOutcomeForWindow = null;
+  return outcome;
+});
 
 // ---------- lifecycle ----------
 
@@ -246,14 +305,21 @@ app.on('before-quit', () => { quitting = true; });
 app.on('window-all-closed', () => app.quit());
 
 app.whenReady().then(() => {
+  const updateOutcome = readUpdateOutcome(); // may set startHidden, so before createWindow
   applySettings(null, settings.get());
   createTray();
   createWindow();
+  if (updateOutcome) announceUpdateOutcome(updateOutcome);
+
+  let lastStatus;
   updater.init({
-    automatic: settings.get().autoUpdate,
-    onStateChange: state => {
+    mode: settings.get().updateMode,
+    isIdle: idleForUpdate,
+    shouldAutoInstall: version => settings.get().skipAutoInstall !== version,
+    beforeInstall,
+    onChange: state => {
       send('updates:changed', state);
-      if (state.status === 'ready') refreshTray();
+      if (state.status !== lastStatus) { lastStatus = state.status; refreshTray(); }
     },
   });
 });

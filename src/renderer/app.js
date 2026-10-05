@@ -49,13 +49,20 @@ function paintAvatar(el, account) {
 
 const errorText = err => String(err?.message ?? err).replace(/^Error invoking remote method '[^']+': (Error: )?/, '');
 
-function toast(message, { error = false } = {}) {
+function toast(message, { error = false, action = null, duration } = {}) {
   const el = document.createElement('div');
-  el.className = `toast${error ? ' error' : ''}`;
+  el.className = `toast${error ? ' error' : ''}${action ? ' has-action' : ''}`;
   el.innerHTML = `<svg><use href="#i-${error ? 'power' : 'check'}"/></svg><span></span>`;
   el.querySelector('span').textContent = message;
+  if (action) {
+    const b = document.createElement('button');
+    b.className = 'link';
+    b.textContent = action.label;
+    b.onclick = action.run;
+    el.append(b);
+  }
   $('#toasts').append(el);
-  setTimeout(() => { el.classList.add('out'); setTimeout(() => el.remove(), 250); }, error ? 5000 : 2600);
+  setTimeout(() => { el.classList.add('out'); setTimeout(() => el.remove(), 250); }, duration ?? (error || action ? 6000 : 2600));
 }
 
 function confirmDialog({ title, body, ok }) {

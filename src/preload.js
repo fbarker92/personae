@@ -29,7 +29,8 @@ contextBridge.exposeInMainWorld('personae', {
   checkForUpdates: () => ipcRenderer.invoke('updates:check'),
   downloadUpdate: () => ipcRenderer.invoke('updates:download'),
   installUpdate: () => ipcRenderer.invoke('updates:install'),
-  openRelease: () => ipcRenderer.invoke('updates:openRelease'),
+  openReleaseNotes: version => ipcRenderer.invoke('updates:openNotes', version),
+  takeUpdateOutcome: () => ipcRenderer.invoke('updates:takeOutcome'),
   onUpdateChanged: subscribe('updates:changed'),
   onOpenSettings: subscribe('settings:open'),
   // Switches can start from the window or the tray; the window follows along via these events.
